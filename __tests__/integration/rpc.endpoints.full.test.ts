@@ -1,74 +1,39 @@
 // __tests__/integration/rpc.endpoints.full.test.ts
 
-import path from 'path';
-import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
 import { TestClient } from '../../utils/testClient';
-import dotenv from 'dotenv';
-import { setupTestClient } from '../../utils/setupTestClient';
-
-dotenv.config();
-
-let serverProcess: ChildProcessWithoutNullStreams;
-let client: TestClient;
-
-beforeAll((done) => {
-  const serverPath = path.resolve(__dirname, '../../src/server.ts');
-  serverProcess = spawn('ts-node', [serverPath]);
-
-  serverProcess.stdout?.on('data', (data) => {
-    if (data.toString().includes('Server is running')) {
-      const port = process.env.PORT || '7886';
-      client = new TestClient(`ws://localhost:${port}`);
-      client.connect().then(done);
-    }
-  });
-
-  serverProcess.stderr?.on('data', (err) => {
-    console.error(`[stderr]: ${err}`);
-  });
-});
-
-afterAll(() => {
-  client.close();
-  serverProcess.kill();
-});
+import { setupTestClient } from '../shared/setupTestClient';
 
 describe('Auth Service RPC Endpoint Coverage', () => {
-  const test2FACode = '123456';
-
-  let testEmail: string;
-  let testPassword: string;
+  let client: TestClient;
+  let email: string;
+  let password: string;
+  let code: string;
 
   beforeAll(async () => {
     const setup = await setupTestClient();
-    testEmail = setup.email;
-    testPassword = setup.password;
+    client = setup.client;
+    email = setup.email;
+    password = setup.password;
+    code = setup.code;
   });
 
   it('calls ping()', async () => {
-    const result = await client.call('ping');
-    expect(result).toBe('pong');
+    const result = await client.call('ping', {});
+    expect(result).toEqual({ success: true });
   });
 
   it('creates a password with createPassword()', async () => {
-    const result = await client.call('createPassword', testPassword);
-    expect(typeof result).toBe('string');
-    expect(result.length).toBeGreaterThan(0);
+    const result = await client.call('createPassword', { email, password });
+    expect(result).toEqual({ success: true });
   });
 
   it('authenticates user with authenticate()', async () => {
-    const result = await client.call('authenticate', {
-      email: testEmail,
-      password: testPassword,
-    });
+    const result = await client.call('authenticate', { email, password });
     expect(result).toEqual({ success: true });
   });
 
   it('verifies 2FA code with verify2FA()', async () => {
-    const result = await client.call('verify2FA', {
-      email: testEmail,
-      code: test2FACode,
-    });
+    const result = await client.call('verify2FA', { email, code });
     expect(result).toEqual({ success: true });
   });
 });
