@@ -1,6 +1,11 @@
+// __tests__/integration/rpc.endpoints.full.test.ts
+
 import path from 'path';
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
-import { TestClient } from '../../utils/testClient'; // Assume you move it to utils/testClient.ts
+import { TestClient } from '../../utils/testClient';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 let serverProcess: ChildProcessWithoutNullStreams;
 let client: TestClient;
@@ -11,7 +16,8 @@ beforeAll((done) => {
 
   serverProcess.stdout?.on('data', (data) => {
     if (data.toString().includes('Server is running')) {
-      client = new TestClient('ws://localhost:7885');
+      const port = process.env.PORT || '7886';
+      client = new TestClient(`ws://localhost:${port}`);
       client.connect().then(done);
     }
   });
@@ -26,47 +32,37 @@ afterAll(() => {
   serverProcess.kill();
 });
 
-describe('Full RPC Endpoint Coverage', () => {
-  const testClientId = 'test-id';
+describe('Auth Service RPC Endpoint Coverage', () => {
+  const testEmail = 'testuser@example.com';
+  const testPassword = 'S3cretP@ssw0rd';
+  const test2FACode = '123456';
 
   it('calls ping()', async () => {
     const result = await client.call('ping');
     expect(result).toBe('pong');
   });
 
-  it('creates a client with createClient()', async () => {
-    const newClient = await client.call('createClient', {
-      id: testClientId,
-      name: 'Test User',
-      email: 'test@example.com',
+  it('creates a password with createPassword()', async () => {
+    const result = await client.call('createPassword', {
+      email: testEmail,
+      password: testPassword,
     });
-    expect(newClient).toMatchObject({ id: testClientId, email: 'test@example.com' });
+    expect(result).toEqual({ success: true });
   });
 
-  it('fetches client with getClient()', async () => {
-    const fetched = await client.call('getClient', testClientId);
-    expect(fetched).toHaveProperty('email', 'test@example.com');
+  it('authenticates user with authenticate()', async () => {
+    const result = await client.call('authenticate', {
+      email: testEmail,
+      password: testPassword,
+    });
+    expect(result).toEqual({ success: true });
   });
 
-  it('updates client with updateClientData()', async () => {
-    await client.call('updateClientData', [testClientId, { name: 'Updated Name' }]);
-    const updated = await client.call('getClient', testClientId);
-    expect(updated).toHaveProperty('name', 'Updated Name');
-  });
-
-  it('checks readiness with getClientReadiness()', async () => {
-    const readiness = await client.call('getClientReadiness', [testClientId, 'mock-service']);
-    expect(readiness).toHaveProperty('ready');
-  });
-
-  it('sends message with sendMessage()', async () => {
-    const response = await client.call('sendMessage', { clientId: testClientId, message: 'hello' });
-    expect(response).toBe('queued');
-  });
-
-  it('deletes client with deleteClient()', async () => {
-    await client.call('deleteClient', testClientId);
-    const fetched = await client.call('getClient', testClientId);
-    expect(fetched).toBeNull();
+  it('verifies 2FA code with verify2FA()', async () => {
+    const result = await client.call('verify2FA', {
+      email: testEmail,
+      code: test2FACode,
+    });
+    expect(result).toEqual({ success: true });
   });
 });
