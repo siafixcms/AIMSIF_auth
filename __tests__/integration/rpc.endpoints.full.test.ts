@@ -16,7 +16,7 @@ beforeAll((done) => {
 
   serverProcess.stdout?.on('data', (data) => {
     if (data.toString().includes('Server is running')) {
-      const port = process.env.PORT || '7886';
+      const port = process.env.PORT || '7885';
       client = new TestClient(`ws://localhost:${port}`);
       client.connect().then(done);
     }
@@ -43,10 +43,7 @@ describe('Auth Service RPC Endpoint Coverage', () => {
   });
 
   it('creates a password with createPassword()', async () => {
-    const result = await client.call('createPassword', {
-      email: testEmail,
-      password: testPassword,
-    });
+    const result = await client.call('createPassword', testPassword);
     expect(result).toEqual({ success: true });
   });
 

@@ -30,3 +30,8 @@ export async function verify2FA(email: string, code: string): Promise<{ success:
   const expectedCode = await redis.get(key);
   return { success: expectedCode === code };
 }
+
+export async function sendMessage({ clientId, message }: { clientId: string, message: string }): Promise<string> {
+  console.log(`Message for ${clientId}: ${message}`);
+  return 'queued';
+}

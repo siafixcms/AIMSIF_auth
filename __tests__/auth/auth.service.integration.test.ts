@@ -45,7 +45,7 @@ describe('Auth Service Integration', () => {
     await redis.set(`2fa:${email}`, code);
 
     const result = await verify2FA(email, code);
-    expect(result).toBe(true);
+    expect(result).toEqual({ success: true });
   });
 
   it('rejects incorrect 2FA code', async () => {
@@ -53,6 +53,6 @@ describe('Auth Service Integration', () => {
     await redis.set(`2fa:${email}`, '654321');
 
     const result = await verify2FA(email, '000000');
-    expect(result).toBe(false);
+    expect(result).toEqual({ success: false });
   });
 });
