@@ -1,7 +1,7 @@
 // __tests__/integration/rpc.endpoints.full.test.ts
 
 import { TestClient } from '../../utils/testClient';
-import { setupTestClient } from '../shared/setupTestClient';
+import { setupTestClient } from '../../utils/setupTestClient';
 
 describe('Auth Service RPC Endpoint Coverage', () => {
   let client: TestClient;
