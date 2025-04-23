@@ -21,12 +21,6 @@ export async function authenticate(email: string, password: string): Promise<{ s
   return { success: true };
 }
 
-export async function verify2FA(email: string, code: string): Promise<boolean> {
-  const key = `2fa:${email}`;
-  const expectedCode = await redis.get(key);
-  return expectedCode === code;
-}
-
 export async function ping(): Promise<string> {
   return 'pong';
 }
