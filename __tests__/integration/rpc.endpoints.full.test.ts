@@ -4,7 +4,7 @@ import path from 'path';
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
 import { TestClient } from '../../utils/testClient';
 import dotenv from 'dotenv';
-import { setupTestClient } from '../shared/setupTestClient';
+import { setupTestClient } from '../../utils/setupTestClient';
 
 dotenv.config();
 

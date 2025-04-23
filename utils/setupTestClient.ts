@@ -1,7 +1,7 @@
 // __tests__/shared/setupTestClient.ts
 
 import bcrypt from 'bcrypt';
-import { mockClientService } from '../../src/__mocks__/mockClientService';
+import { mockClientService } from '../src/__mocks__/mockClientService';
 
 type SetupOptions = {
   email?: string;

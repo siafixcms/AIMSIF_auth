@@ -2,7 +2,7 @@
 
 import { createPassword, authenticate, verify2FA } from '../../src/service';
 import { mockClientService } from '../../src/__mocks__/mockClientService';
-import { setupTestClient } from '../shared/setupTestClient';
+import { setupTestClient } from '../../utils/setupTestClient';
 
 describe('Auth Service Integration', () => {
   const code = '123456';

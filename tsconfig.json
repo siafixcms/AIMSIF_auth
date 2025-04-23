@@ -10,5 +10,5 @@
     "resolveJsonModule": true,
     "outDir": "./dist"
   },
-  "include": ["src", "__tests__"]
+  "include": ["src", "__tests__", "utils/setupTestClient.ts"]
 }
