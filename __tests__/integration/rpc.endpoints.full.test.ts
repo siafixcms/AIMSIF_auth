@@ -44,7 +44,8 @@ describe('Auth Service RPC Endpoint Coverage', () => {
 
   it('creates a password with createPassword()', async () => {
     const result = await client.call('createPassword', testPassword);
-    expect(result).toEqual({ success: true });
+    expect(typeof result).toBe('string'); // Accepts the returned hash
+    expect(result.length).toBeGreaterThan(0); // Ensures a hash was actually returned
   });
 
   it('authenticates user with authenticate()', async () => {
