@@ -4,8 +4,7 @@ import path from 'path';
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
 import { TestClient } from '../../utils/testClient';
 import dotenv from 'dotenv';
-import bcrypt from 'bcrypt';
-import { mockClientService } from '../../src/__mocks__/mockClientService';
+import { setupTestClient } from '../shared/setupTestClient';
 
 dotenv.config();
 
@@ -35,19 +34,15 @@ afterAll(() => {
 });
 
 describe('Auth Service RPC Endpoint Coverage', () => {
-  const testEmail = 'testuser@example.com';
-  const testPassword = 'S3cretP@ssw0rd';
   const test2FACode = '123456';
 
-  beforeAll(async () => {
-    // Hash the test password
-    const hashedPassword = await bcrypt.hash(testPassword, 10);
+  let testEmail: string;
+  let testPassword: string;
 
-    // Register the mock client
-    mockClientService.registerClient({
-      email: testEmail,
-      passwordHash: hashedPassword,
-    });
+  beforeAll(async () => {
+    const setup = await setupTestClient();
+    testEmail = setup.email;
+    testPassword = setup.password;
   });
 
   it('calls ping()', async () => {
