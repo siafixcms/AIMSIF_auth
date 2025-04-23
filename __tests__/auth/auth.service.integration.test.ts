@@ -10,7 +10,7 @@
 
 import { describe, it, beforeAll, afterAll, expect } from '@jest/globals';
 import { createPassword, authenticate, verify2FA } from '../../src/service';
-import { mockClientService } from '../mocks/mockClientService';
+import { mockClientService } from '../__mocks__/mockClientService';
 import * as redis from '../../src/db/redis'; // Assuming Redis is used for 2FA codes
 
 jest.mock('../../src/client-rpc', () => ({
