@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import { mockClientService } from './__mocks__/mockClientService';
-import * as redis from './db/redis'; // assuming a redis module with get/set mocked in test
+import * as redis from './db/redis';
 
 export async function createPassword(password: string): Promise<string> {
   const saltRounds = 10;
