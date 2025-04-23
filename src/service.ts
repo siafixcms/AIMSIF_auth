@@ -1,19 +1,24 @@
 import bcrypt from 'bcryptjs';
-import { getClientByEmail } from './__mocks__/mockClientService';
+import { mockClientService } from './__mocks__/mockClientService';
+import * as redis from './db/redis';
 
 export async function createPassword(password: string): Promise<string> {
   const saltRounds = 10;
-  return bcrypt.hash(password, saltRounds);
+  return await bcrypt.hash(password, saltRounds);
 }
 
 export async function authenticate(email: string, password: string): Promise<{ success: boolean }> {
-  const client = await getClientByEmail(email);
+  const client = await mockClientService.getClientByEmail(email);
   if (!client) {
-    return { success: false };
+    throw new Error('Client not found');
   }
 
   const isValid = await bcrypt.compare(password, client.passwordHash);
-  return { success: isValid };
+  if (!isValid) {
+    throw new Error('Invalid password');
+  }
+
+  return { success: true };
 }
 
 export async function ping(): Promise<string> {
@@ -21,12 +26,9 @@ export async function ping(): Promise<string> {
 }
 
 export async function verify2FA(email: string, code: string): Promise<{ success: boolean }> {
-  const client = await getClientByEmail(email);
-  if (!client || !client.twoFACode) {
-    return { success: false };
-  }
-
-  return { success: client.twoFACode === code };
+  const key = `2fa:${email}`;
+  const expectedCode = await redis.get(key);
+  return { success: expectedCode === code };
 }
 
 export async function sendMessage({ clientId, message }: { clientId: string, message: string }): Promise<string> {
