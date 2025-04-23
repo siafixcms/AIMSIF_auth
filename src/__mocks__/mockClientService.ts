@@ -1,20 +1,21 @@
+// __mocks__/mockClientService.ts
+
 type Client = {
   email: string;
   passwordHash: string;
 };
 
-const mockDB: Record<string, Client> = {};
+let clients: Client[] = [];
 
 export const mockClientService = {
   getClientByEmail: async (email: string): Promise<Client | null> => {
-    return mockDB[email] || null;
+    const client = clients.find(c => c.email === email);
+    return client || null;
   },
-
-  mockResolvedValueOnce: (data: Client) => {
-    mockDB[data.email] = data;
+  registerClient: (client: Client) => {
+    clients.push(client);
   },
-
   reset: () => {
-    Object.keys(mockDB).forEach(key => delete mockDB[key]);
-  }
+    clients = [];
+  },
 };
