@@ -26,3 +26,13 @@ export async function verify2FA(email: string, code: string): Promise<boolean> {
   const expectedCode = await redis.get(key);
   return expectedCode === code;
 }
+
+export async function ping(): Promise<string> {
+  return 'pong';
+}
+
+export async function verify2FA(email: string, code: string): Promise<{ success: boolean }> {
+  const key = `2fa:${email}`;
+  const expectedCode = await redis.get(key);
+  return { success: expectedCode === code };
+}
