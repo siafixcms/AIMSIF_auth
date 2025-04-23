@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@types/node": "^22.14.1",
+    "bcrypt": "^5.1.1",
     "bcryptjs": "^3.0.2",
     "jsonrpc-lite": "^2.2.0",
     "mongodb": "^6.16.0",

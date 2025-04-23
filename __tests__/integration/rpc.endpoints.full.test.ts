@@ -4,6 +4,8 @@ import path from 'path';
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
 import { TestClient } from '../../utils/testClient';
 import dotenv from 'dotenv';
+import bcrypt from 'bcrypt';
+import { mockClientService } from '../../src/__mocks__/mockClientService';
 
 dotenv.config();
 
@@ -16,7 +18,7 @@ beforeAll((done) => {
 
   serverProcess.stdout?.on('data', (data) => {
     if (data.toString().includes('Server is running')) {
-      const port = process.env.PORT || '7885';
+      const port = process.env.PORT || '7886';
       client = new TestClient(`ws://localhost:${port}`);
       client.connect().then(done);
     }
@@ -37,6 +39,17 @@ describe('Auth Service RPC Endpoint Coverage', () => {
   const testPassword = 'S3cretP@ssw0rd';
   const test2FACode = '123456';
 
+  beforeAll(async () => {
+    // Hash the test password
+    const hashedPassword = await bcrypt.hash(testPassword, 10);
+
+    // Register the mock client
+    mockClientService.registerClient({
+      email: testEmail,
+      passwordHash: hashedPassword,
+    });
+  });
+
   it('calls ping()', async () => {
     const result = await client.call('ping');
     expect(result).toBe('pong');
@@ -44,8 +57,8 @@ describe('Auth Service RPC Endpoint Coverage', () => {
 
   it('creates a password with createPassword()', async () => {
     const result = await client.call('createPassword', testPassword);
-    expect(typeof result).toBe('string'); // Accepts the returned hash
-    expect(result.length).toBeGreaterThan(0); // Ensures a hash was actually returned
+    expect(typeof result).toBe('string');
+    expect(result.length).toBeGreaterThan(0);
   });
 
   it('authenticates user with authenticate()', async () => {
